@@ -25,7 +25,7 @@
                       <th>Doctor Name</th>
                       <th>Appointment Date</th>
                       <th>Status</th>
-                      <th>Reason</th>
+                      <th>Appointment Type</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -50,7 +50,7 @@
                       <th>Patient Name</th>
                       <th>Appointment Date</th>
                       <th>Status</th>
-                      <th>Reason</th>
+                      <th>Appointment Type</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -66,7 +66,7 @@
                       <td>
                         <div v-if="appointment.status === 'scheduled'">
                           <button class="btn btn-sm btn-primary" @click="openCompleteAppointmentModal(appointment.id)">Complete</button>
-                          <button class="btn btn-sm btn-danger" @click="updateAppointmentStatus(appointment.id, 'canceled')">Cancel</button>
+                          <button class="btn btn-sm btn-danger" @click="confirmCancelAppointment(appointment.id)">Cancel</button>
                         </div>
                         <div v-else-if="appointment.status === 'completed'" class="text-success">
                           Completed
@@ -104,7 +104,7 @@
                         <td>{{ appointment.reason }}</td>
                         <td>
                           <div v-if="appointment.status === 'scheduled'">
-                            <button class="btn btn-sm btn-danger" @click="cancelAppointment(appointment.id)">Cancel</button>
+                            <button class="btn btn-sm btn-danger" @click="confirmCancelAppointment(appointment.id)">Cancel</button>
                           </div>
                           <div v-else-if="appointment.status === 'completed'" class="text-success">
                             Completed
@@ -168,8 +168,8 @@
               <p>Are you sure you want to cancel this appointment?</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-danger" @click="cancelAppointment(this.appointmentIdToCancel)">Yes, Cancel</button>
-              <button type="button" class="btn btn-secondary" @click="cancelCancelAppointment()">No, Go Back</button>
+              <button type="button" class="btn btn-danger" @click="cancelAppointment(this.appointmentIdToCancel, 'cancelled')">Yes</button>
+              <button type="button" class="btn btn-secondary" @click="cancelCancelAppointment()">Cancel</button>
             </div>
           </div>
         </div>
