@@ -15,20 +15,20 @@ class AppointmentController extends Controller
     use AuthorizesRequests;
 
     public function index()
-{
-    $user = Auth::user();
-    $role = $user->role;
+    {
+        $user = Auth::user();
+        $role = $user->role;
 
-    if ($role === 'admin') {
-        $appointments = Appointment::with(['patient', 'doctor'])->get();
-    } elseif ($role === 'doctor') {
-        $appointments = Appointment::with('patient')->where('doctor_id', $user->id)->get();
-    } else {
-        $appointments = Appointment::with('doctor')->where('patient_id', $user->id)->get();
+        if ($role === 'admin') {
+            $appointments = Appointment::with(['patient', 'doctor'])->get();
+        } elseif ($role === 'doctor') {
+            $appointments = Appointment::with('patient')->where('doctor_id', $user->id)->get();
+        } else {
+            $appointments = Appointment::with('doctor')->where('patient_id', $user->id)->get();
+        }
+
+        return response()->json($appointments);
     }
-
-    return response()->json($appointments);
-}
 
     public function store(Request $request)
     {
@@ -62,7 +62,6 @@ class AppointmentController extends Controller
     
         $appointment->update($request->only('status'));
     
-        LOG::info($appointment);
         if ($request->status === 'completed') {
             try {
                 MedicalRecord::create([

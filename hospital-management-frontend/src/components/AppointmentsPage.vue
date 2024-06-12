@@ -16,7 +16,8 @@
           <div class="col-md-12 mt-5">
             <div class="card shadow p-4">
               <h3 class="text-center mb-4 text-center">Manage Appointments</h3>
-              <div v-if="userRole === 'admin' || userRole === 'doctor'">
+              <div v-if="userRole === 'admin'">
+                <h5>All Appointments</h5>
                 <table class="table">
                   <thead>
                     <tr>
@@ -29,7 +30,7 @@
                   </thead>
                   <tbody>
                     <tr v-if="appointments.length === 0">
-                      <td colspan="5" class="text-center">No Appointments</td>
+                      <td colspan="4" class="text-center">No Appointments</td>
                     </tr>
                     <tr v-for="appointment in appointments" :key="appointment.id">
                       <td>{{ appointment.patient.name }}</td>
@@ -41,10 +42,47 @@
                   </tbody>
                 </table>
               </div>
+              <div v-else-if="userRole === 'doctor'">
+                <h5>My Appointments</h5>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Patient Name</th>
+                      <th>Appointment Date</th>
+                      <th>Status</th>
+                      <th>Reason</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-if="appointments.length === 0">
+                      <td colspan="4" class="text-center">No Appointments</td>
+                    </tr>
+                    <tr v-for="appointment in appointments" :key="appointment.id">
+                      <td>{{ appointment.patient.name }}</td>
+                      <td>{{ appointment.appointment_date }}</td>
+                      <td>{{ appointment.status }}</td>
+                      <td>{{ appointment.reason }}</td>
+                      <td>
+                        <div v-if="appointment.status === 'scheduled'">
+                          <button class="btn btn-sm btn-primary" @click="openCompleteAppointmentModal(appointment.id)">Complete</button>
+                          <button class="btn btn-sm btn-danger" @click="updateAppointmentStatus(appointment.id, 'canceled')">Cancel</button>
+                        </div>
+                        <div v-else-if="appointment.status === 'completed'" class="text-success">
+                          Completed
+                        </div>
+                        <div v-else-if="appointment.status === 'cancelled'" class="text-danger">
+                          Cancelled
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
               <div v-else>
                 <button class="btn btn-primary mb-3" @click="toggleAppointments">{{ showAppointments ? 'Book appointment' : 'My appointments' }}</button>
                 <div v-if="showAppointments">
-                  <h3>My Appointments</h3>
+                  <h5>My Appointments</h5>
                   <table class="table">
                     <thead>
                       <tr>
@@ -68,13 +106,19 @@
                           <div v-if="appointment.status === 'scheduled'">
                             <button class="btn btn-sm btn-danger" @click="cancelAppointment(appointment.id)">Cancel</button>
                           </div>
+                          <div v-else-if="appointment.status === 'completed'" class="text-success">
+                            Completed
+                          </div>
+                          <div v-else-if="appointment.status === 'cancelled'" class="text-danger">
+                            Cancelled
+                          </div>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <div v-else>
-                  <h3>Book Appointment</h3>
+                  <h5>Appointment Booking</h5>
                   <form @submit.prevent="bookAppointment">
                     <div class="row mb-3">
                       <div class="col-md-6">
@@ -126,6 +170,36 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" @click="cancelAppointment(this.appointmentIdToCancel)">Yes, Cancel</button>
               <button type="button" class="btn btn-secondary" @click="cancelCancelAppointment()">No, Go Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+    <!-- Complete Appointment Modal -->
+    <transition name="modal">
+      <div v-if="showCompleteAppointmentModal" class="modal-backdrop">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Complete Appointment</h5>
+              <button type="button" class="btn-close" @click="closeCompleteAppointmentModal"></button>
+            </div>
+            <div class="modal-body">
+              <form @submit.prevent="completeAppointment">
+                <div class="mb-3">
+                  <label for="patientId" class="form-label">Patient ID</label>
+                  <input type="text" v-model="completeAppointmentData.patient_id" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="doctorName" class="form-label">Doctor</label>
+                  <input type="text" v-model="completeAppointmentData.doctor_name" class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea v-model="completeAppointmentData.description" class="form-control" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Complete</button>
+              </form>
             </div>
           </div>
         </div>
@@ -291,7 +365,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .side-navigation {
   background-color: #f8f9fa;
@@ -313,7 +386,6 @@ export default {
   background: violet;
   color: #8a2be2;
   transition: color 0.3s;
-  width: 200px;
 }
 
 .btn-primary:hover {
@@ -329,6 +401,10 @@ export default {
 .btn-danger:hover {
   background-color: #c0392b;
   border-color: #c0392b;
+}
+
+.btn {
+  margin: 5px;
 }
 
 .modal-backdrop {

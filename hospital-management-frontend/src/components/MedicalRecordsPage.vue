@@ -230,6 +230,10 @@ export default {
   border-color: #c0392b;
 }
 
+.btn {
+  margin: 5px;
+}
+
 .modal-backdrop {
   position: fixed;
   top: 0;

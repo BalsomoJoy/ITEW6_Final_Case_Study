@@ -23,12 +23,13 @@ class MedicalRecordController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        LOG::info($records);
         foreach ($records as $record) {
             if (!$record->patient) {
                 $patient = \App\Models\User::find($record->patient_id);
-                $record->patient_name = $patient ? $patient->name : 'Unknown';
+                $record->patient_name = $patient ? $patient->fullname : 'Unknown';
             } else {
-                $record->patient_name = $record->patient->name;
+                $record->patient_name = $record->patient->fullname;
             }
         
         }
