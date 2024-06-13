@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request) 
-    {
+    //for new user and creates a corresponding patient profile in the system.
+    public function register(Request $request){
         $request->validate([
             'name' => 'required|string|max:50',
             'email' => 'required|string|email|max:50|unique:users',
@@ -37,9 +37,8 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Registered successfully'], 201);
     }
-
-    public function login(Request $request) 
-    {
+    //this is for function handles user login
+    public function login(Request $request) {
         $data = $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -57,16 +56,13 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logged out successfully','token' => $token, 'user' => $user], 200);
     }
-
-    public function logout(Request $request)
-    {
+    public function logout(Request $request) {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logged out successfully'], 200);
     }
-
-    public function getUserRole()
-    {
+    //this is for user role
+    public function getUserRole(){
         $user = Auth::user();
         return response()->json(['role' => $user->role]);
     }
