@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function index()
-    {
+    //This function will retrieve user role based on the admin will given
+    public function index(){
         $user = auth()->user();
 
         if (!$user) {
@@ -35,9 +35,8 @@ class UserController extends Controller
 
         return response()->json(['patients' => $patients ?? null, 'doctors' => $doctors ?? null, 'admin' => $admin ?? null]);
     }
-
-    public function update(Request $request)
-    {
+    // this function  updates  the user  profile  based on their role, for doctors and patients
+    public function update(Request $request){
         $user = auth()->user();
         
         $userRecord = User::find($user->id);
@@ -70,5 +69,4 @@ class UserController extends Controller
         return response()->json(['message' => 'User profile updated successfully']);
     }
 
-    
 }
